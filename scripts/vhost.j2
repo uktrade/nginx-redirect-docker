@@ -1,0 +1,25 @@
+server {
+
+  listen 80;
+{% if item.ssl.enabled %}
+  listen 443 ssl;
+{% endif %}
+  server_name {{ item.vhost | join(" ")}};
+  root /srv/nginx/docroot/{{ item.id }};
+
+  add_header Cache-Control "public, must-revalidate";
+
+{% if item.ssl.enabled %}
+  ssl_certificate /etc/nginx/ssl/{{ item.id }}/cert;
+  ssl_certificate_key /etc/nginx/ssl/{{ item.id }}/key;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl_prefer_server_ciphers on;
+  ssl_stapling on;
+  ssl_stapling_verify on;
+  add_header Strict-Transport-Security "max-age=63072000; includeSubdomains; preload";
+  add_header X-Frame-Options DENY;
+  add_header X-Content-Type-Options nosniff;
+{% endif %}
+
+  return {{ item.http_code }} {{ item.dest }}$request_uri;
+}

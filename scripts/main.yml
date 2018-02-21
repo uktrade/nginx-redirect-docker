@@ -1,0 +1,51 @@
+---
+
+- hosts: localhost
+  connection: local
+  vars_files:
+  - vars.yml
+  tasks:
+  - file:
+      path: /etc/nginx/ssl
+      owner: root
+      group: root
+      state: directory
+  - file:
+      path: /srv/nginx/docroot
+      owner: root
+      group: root
+      state: directory
+  - file:
+      path: "/etc/nginx/ssl/{{ item.id }}"
+      owner: root
+      group: root
+      state: directory
+    with_items: "{{ nginx_vhosts }}"
+  - file:
+      path: "/srv/nginx/docroot/{{ item.id }}"
+      owner: root
+      group: root
+      state: directory
+    with_items: "{{ nginx_vhosts }}"
+  - copy:
+      content: "{{ item.ssl.key }}"
+      dest: "/etc/nginx/ssl/{{ item.id }}/key"
+      owner: root
+      group: root
+      mode: 0600
+    when: item.ssl.enabled
+    with_items: "{{ nginx_vhosts }}"
+  - copy:
+      content: "{{ item.ssl.cert }}"
+      dest: "/etc/nginx/ssl/{{ item.id }}/cert"
+      owner: root
+      group: root
+      mode: 0644
+    when: item.ssl.enabled
+    with_items: "{{ nginx_vhosts }}"
+  - template:
+      src: vhost.j2
+      dest: "/etc/nginx/conf.d/{{ item.id }}.conf"
+      owner: root
+      group: root
+    with_items: "{{ nginx_vhosts }}"
