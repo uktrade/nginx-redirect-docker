@@ -1,0 +1,13 @@
+---
+
+nginx_vhosts:
+  - id: localhost
+    vhost:
+    - localhost.com
+    - www.localhost.com
+    dest: https://example.com
+    http_code: 302
+    ssl:
+      enabled: true
+      cert: null
+      key: null
