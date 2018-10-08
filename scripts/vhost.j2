@@ -1,5 +1,6 @@
 server {
 
+  server_tokens off;
   listen 80;
 {% if item.ssl.enabled %}
   listen 443 ssl;
